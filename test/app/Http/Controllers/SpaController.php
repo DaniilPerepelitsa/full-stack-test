@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\PostCategories;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use JsonMachine\JsonMachine;
 
@@ -19,12 +18,10 @@ class SpaController extends Controller
 
         $file = JsonMachine::fromFile('../../feed.json');
 
-        $posts = [];
-        $categories = [];
-
         foreach ($file as $key => $data) {
 
-            $posts[$key] = Post::firstOrCreate([
+            /** @var Post $post */
+            $post = Post::firstOrCreate([
 //                'id' => $data['id'],
                 'title' => $data['title'],
                 'slug' => $data['slug'],
@@ -43,14 +40,18 @@ class SpaController extends Controller
                 if ($idx === 0){
                     $isPrimary = true;
                 }
-                $categories[$idx] = Category::firstOrCreate(['name' => $category, 'is_primary' => $isPrimary]);
 
+                $post->categories()->attach(
+                    Category::firstOrCreate(['name' => $category])->id,
+                    ['is_primary' => $isPrimary]
+                );
 
-                PostCategories::firstOrCreate([
-                    'post_id' => $posts[$key]->id,
-                    'category_id' => $categories[$idx]->id,
-                ]);
+//                PostCategories::firstOrCreate([
+//                    'post_id' => $posts[$key]->id,
+//                    'category_id' => $categories[$idx]->id,
+//                ]);
             }
+
         }
     }
 }

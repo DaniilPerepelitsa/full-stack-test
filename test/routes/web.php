@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\SpaController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +19,9 @@ use Illuminate\Support\Facades\Route;
 //Route::get('/', function () {
 //    return view('welcome');
 //});
-
+Route::prefix('api')->group(function () {
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::get('/categories/{id}/posts', [PostController::class, 'getPostForCategory']);
+});
 Route::get('/test', [SpaController::class, 'test']);
 Route::get('/{any}', [SpaController::class, 'index'])->where('any', '.*');
