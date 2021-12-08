@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use Illuminate\Http\JsonResponse;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function index()
     {
