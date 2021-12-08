@@ -35,6 +35,8 @@ Immediately you will see a search box where you can enter a word or phrase and c
 
 After clicking this button, all the results that best match your search criteria will appear on page.
 
+You can also click on the post and go to view.
+
 Also, all posts results returned with pagination for convenience of use.
 
 
