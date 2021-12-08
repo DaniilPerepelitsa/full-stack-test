@@ -5360,21 +5360,42 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "Posts",
   data: function data() {
     return {
-      posts: [],
-      searchText: ''
+      pager: [],
+      searchText: '',
+      perPage: 0,
+      lastPage: 0,
+      indexCurrentPage: 1,
+      total: 0
     };
+  },
+  computed: {
+    posts: function posts() {
+      return this.pager.data || [];
+    },
+    currentPage: function currentPage() {
+      return this.indexCurrentPage = this.pager.current_page;
+    }
   },
   props: ['id'],
   methods: {
     getPostsForCategory: function getPostsForCategory(id) {
       var _this = this;
 
-      axios.get('/api/categories/' + id + '/posts').then(function (response) {
-        _this.posts = response.data;
+      var page = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+      console.log('update');
+      axios.get('/api/categories/' + this.id + '/posts?page=' + page).then(function (response) {
+        console.log('DATA', response.data);
+        _this.pager = response.data;
+        _this.perPage = response.data.per_page;
+        _this.lastPage = response.data.last_page;
+        _this.indexCurrentPage = response.data.current_page;
+        _this.total = response.data.total;
       });
     },
     searchPosts: function searchPosts(text) {
@@ -5384,8 +5405,15 @@ __webpack_require__.r(__webpack_exports__);
         search: text,
         id: this.id
       }).then(function (response) {
-        _this2.posts = response.data;
+        _this2.pager = response.data;
+        _this2.perPage = response.data.per_page;
+        _this2.lastPage = response.data.last_page;
+        _this2.indexCurrentPage = response.data.current_page;
+        _this2.total = response.data.total;
       });
+    },
+    setPage: function setPage(page) {
+      this.currentPage = page;
     }
   },
   created: function created() {
@@ -5403,11 +5431,13 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
-/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
-/* harmony import */ var _components_Categories__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/Categories */ "./resources/js/components/Categories.vue");
-/* harmony import */ var _components_Posts__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/Posts */ "./resources/js/components/Posts.vue");
-/* harmony import */ var _components_PostItem__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/PostItem */ "./resources/js/components/PostItem.vue");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
+/* harmony import */ var vue_pagination_2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-pagination-2 */ "./node_modules/vue-pagination-2/compiled/main.js");
+/* harmony import */ var vue_pagination_2__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_pagination_2__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
+/* harmony import */ var _components_Categories__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/Categories */ "./resources/js/components/Categories.vue");
+/* harmony import */ var _components_Posts__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/Posts */ "./resources/js/components/Posts.vue");
+/* harmony import */ var _components_PostItem__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/PostItem */ "./resources/js/components/PostItem.vue");
 
 
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
@@ -5416,8 +5446,10 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 
 
-vue__WEBPACK_IMPORTED_MODULE_3__["default"].use(vue_router__WEBPACK_IMPORTED_MODULE_4__["default"]);
-var router = new vue_router__WEBPACK_IMPORTED_MODULE_4__["default"]({
+
+vue__WEBPACK_IMPORTED_MODULE_4__["default"].component('pagination', (vue_pagination_2__WEBPACK_IMPORTED_MODULE_0___default()));
+vue__WEBPACK_IMPORTED_MODULE_4__["default"].use(vue_router__WEBPACK_IMPORTED_MODULE_5__["default"]);
+var router = new vue_router__WEBPACK_IMPORTED_MODULE_5__["default"]({
   mode: 'history',
   routes: [{
     path: '/',
@@ -5425,20 +5457,20 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_4__["default"]({
   }, {
     path: '/home',
     name: 'home',
-    component: _components_Categories__WEBPACK_IMPORTED_MODULE_0__["default"]
+    component: _components_Categories__WEBPACK_IMPORTED_MODULE_1__["default"]
   }, {
     path: '/categories/:id/posts',
     name: 'posts',
-    component: _components_Posts__WEBPACK_IMPORTED_MODULE_1__["default"],
+    component: _components_Posts__WEBPACK_IMPORTED_MODULE_2__["default"],
     props: true
   }, {
     path: '/post/:id/show',
     name: 'show-post',
-    component: _components_PostItem__WEBPACK_IMPORTED_MODULE_2__["default"],
+    component: _components_PostItem__WEBPACK_IMPORTED_MODULE_3__["default"],
     props: true
   }]
 });
-var app = new vue__WEBPACK_IMPORTED_MODULE_3__["default"]({
+var app = new vue__WEBPACK_IMPORTED_MODULE_4__["default"]({
   router: router,
   el: '#app'
 });
@@ -27868,6 +27900,100 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 /***/ }),
 
+/***/ "./node_modules/merge/lib/src/index.js":
+/*!*********************************************!*\
+  !*** ./node_modules/merge/lib/src/index.js ***!
+  \*********************************************/
+/***/ ((module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.isPlainObject = exports.clone = exports.recursive = exports.merge = exports.main = void 0;
+module.exports = exports = main;
+exports["default"] = main;
+function main() {
+    var items = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        items[_i] = arguments[_i];
+    }
+    return merge.apply(void 0, items);
+}
+exports.main = main;
+main.clone = clone;
+main.isPlainObject = isPlainObject;
+main.recursive = recursive;
+function merge() {
+    var items = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        items[_i] = arguments[_i];
+    }
+    return _merge(items[0] === true, false, items);
+}
+exports.merge = merge;
+function recursive() {
+    var items = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        items[_i] = arguments[_i];
+    }
+    return _merge(items[0] === true, true, items);
+}
+exports.recursive = recursive;
+function clone(input) {
+    if (Array.isArray(input)) {
+        var output = [];
+        for (var index = 0; index < input.length; ++index)
+            output.push(clone(input[index]));
+        return output;
+    }
+    else if (isPlainObject(input)) {
+        var output = {};
+        for (var index in input)
+            output[index] = clone(input[index]);
+        return output;
+    }
+    else {
+        return input;
+    }
+}
+exports.clone = clone;
+function isPlainObject(input) {
+    return input && typeof input === 'object' && !Array.isArray(input);
+}
+exports.isPlainObject = isPlainObject;
+function _recursiveMerge(base, extend) {
+    if (!isPlainObject(base))
+        return extend;
+    for (var key in extend) {
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype')
+            continue;
+        base[key] = (isPlainObject(base[key]) && isPlainObject(extend[key])) ?
+            _recursiveMerge(base[key], extend[key]) :
+            extend[key];
+    }
+    return base;
+}
+function _merge(isClone, isRecursive, items) {
+    var result;
+    if (isClone || !isPlainObject(result = items.shift()))
+        result = {};
+    for (var index = 0; index < items.length; ++index) {
+        var item = items[index];
+        if (!isPlainObject(item))
+            continue;
+        for (var key in item) {
+            if (key === '__proto__' || key === 'constructor' || key === 'prototype')
+                continue;
+            var value = isClone ? clone(item[key]) : item[key];
+            result[key] = isRecursive ? _recursiveMerge(result[key], value) : value;
+        }
+    }
+    return result;
+}
+
+
+/***/ }),
+
 /***/ "./resources/sass/app.scss":
 /*!*********************************!*\
   !*** ./resources/sass/app.scss ***!
@@ -28901,6 +29027,26 @@ var render = function () {
           ]
         )
       }),
+      _vm._v(" "),
+      _c("pagination", {
+        attrs: {
+          records: _vm.total,
+          "per-page": _vm.perPage,
+          pages: _vm.lastPage,
+        },
+        on: {
+          paginate: function ($event) {
+            return _vm.getPostsForCategory(_vm.id, _vm.indexCurrentPage)
+          },
+        },
+        model: {
+          value: _vm.indexCurrentPage,
+          callback: function ($$v) {
+            _vm.indexCurrentPage = $$v
+          },
+          expression: "indexCurrentPage",
+        },
+      }),
     ],
     2
   )
@@ -29022,6 +29168,694 @@ function normalizeComponent (
   }
 }
 
+
+/***/ }),
+
+/***/ "./node_modules/vue-pagination-2/compiled/Pagination.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/vue-pagination-2/compiled/Pagination.js ***!
+  \**************************************************************/
+/***/ ((module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+    value: true
+}));
+
+var _template = __webpack_require__(/*! ./template */ "./node_modules/vue-pagination-2/compiled/template.js");
+
+var _template2 = _interopRequireDefault(_template);
+
+var _RenderlessPagination = __webpack_require__(/*! ./RenderlessPagination */ "./node_modules/vue-pagination-2/compiled/RenderlessPagination.js");
+
+var _RenderlessPagination2 = _interopRequireDefault(_RenderlessPagination);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports["default"] = {
+    name: 'Pagination',
+    components: { RenderlessPagination: _RenderlessPagination2.default },
+    provide: function provide() {
+        var _this = this;
+
+        return {
+            Page: function Page() {
+                return _this.value;
+            },
+            perPage: function perPage() {
+                return _this.perPage;
+            },
+            records: function records() {
+                return _this.records;
+            }
+        };
+    },
+    render: function render(h) {
+        return h('renderless-pagination', { scopedSlots: {
+                default: function _default(props) {
+                    return props.override ? h(props.override, {
+                        attrs: { props: props }
+                    }) : (0, _template2.default)(props)(h);
+                }
+            }
+        });
+    },
+
+    props: {
+        value: {
+            type: Number,
+            required: true,
+            validator: function validator(val) {
+                return val > 0;
+            }
+        },
+        records: {
+            type: Number,
+            required: true
+        },
+        perPage: {
+            type: Number,
+            default: 25
+        },
+        options: {
+            type: Object
+        }
+    },
+    data: function data() {
+        return {
+            aProps: {
+                role: "button"
+            }
+        };
+    }
+};
+module.exports = exports['default'];
+
+/***/ }),
+
+/***/ "./node_modules/vue-pagination-2/compiled/RenderlessPagination.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/vue-pagination-2/compiled/RenderlessPagination.js ***!
+  \************************************************************************/
+/***/ ((module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+    value: true
+}));
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _config = __webpack_require__(/*! ./config */ "./node_modules/vue-pagination-2/compiled/config.js");
+
+var _config2 = _interopRequireDefault(_config);
+
+var _merge = __webpack_require__(/*! merge */ "./node_modules/merge/lib/src/index.js");
+
+var _merge2 = _interopRequireDefault(_merge);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports["default"] = {
+    inject: ['Page', 'records', 'perPage'],
+    props: {
+        itemClass: {
+            required: false,
+            default: 'VuePagination__pagination-item'
+        }
+    },
+    render: function render() {
+        var _this = this;
+
+        return this.$scopedSlots.default({
+            override: this.opts.template,
+            showPagination: this.totalPages > 1,
+            pages: this.pages,
+            pageEvents: function pageEvents(page) {
+                return {
+                    click: function click() {
+                        return _this.setPage(page);
+                    },
+                    keydown: function keydown(e) {
+                        if (e.key === 'ArrowRight') {
+                            _this.next();
+                        }
+
+                        if (e.key === 'ArrowLeft') {
+                            _this.prev();
+                        }
+                    }
+                };
+            },
+            activeClass: this.activeClass,
+            hasEdgeNav: this.opts.edgeNavigation && this.totalChunks > 1,
+            setPage: this.setPage,
+            setFirstPage: this.setPage.bind(this, 1),
+            setLastPage: this.setPage.bind(this, this.totalPages),
+            hasChunksNav: this.opts.chunksNavigation === 'fixed',
+            setPrevChunk: this.prevChunk,
+            setNextChunk: this.nextChunk,
+            setPrevPage: this.prev,
+            firstPageProps: {
+                class: this.Theme.link,
+                disabled: this.page === 1
+            },
+            lastPageProps: {
+                class: this.Theme.link,
+                disabled: this.page === this.totalPages
+            },
+            prevProps: {
+                class: this.Theme.link,
+                disabled: !!this.allowedPageClass(this.page - 1)
+            },
+            nextProps: {
+                class: this.Theme.link,
+                disabled: !!this.allowedPageClass(this.page + 1)
+            },
+            pageClasses: function pageClasses(page) {
+                return _this.itemClass + ' ' + _this.Theme.item + ' ' + _this.activeClass(page);
+            },
+            prevChunkProps: {
+                class: this.Theme.link,
+                disabled: !this.allowedChunk(-1)
+            },
+            nextChunkProps: {
+                class: this.Theme.link,
+                disabled: !this.allowedChunk(1)
+            },
+            setNextPage: this.next,
+            theme: {
+                nav: this.Theme.nav,
+                list: 'VuePagination__pagination ' + this.Theme.list,
+                item: this.Theme.item,
+                disabled: this.Theme.disabled,
+                prev: this.itemClass + ' ' + this.itemClass + '-prev-page ' + this.Theme.item + ' ' + this.Theme.prev + ' ' + this.allowedPageClass(this.page - 1),
+                next: this.itemClass + '  ' + this.itemClass + '-next-page ' + this.Theme.item + ' ' + this.Theme.next + ' ' + this.allowedPageClass(this.page + 1),
+                prevChunk: this.itemClass + ' ' + this.Theme.item + ' ' + this.Theme.prev + ' ' + this.itemClass + '-prev-chunk ' + this.allowedChunkClass(-1),
+                nextChunk: this.itemClass + ' ' + this.Theme.item + ' ' + this.Theme.next + ' ' + this.itemClass + '-next-chunk ' + this.allowedChunkClass(1),
+                firstPage: this.itemClass + ' ' + this.Theme.item + ' ' + (this.page === 1 ? this.Theme.disabled : '') + ' ' + this.itemClass + '-first-page',
+                lastPage: this.itemClass + ' ' + this.Theme.item + ' ' + (this.page === this.totalPages ? this.Theme.disabled : '') + ' ' + this.itemClass + '-last-page',
+                link: this.Theme.link,
+                page: this.itemClass + ' ' + this.Theme.item,
+                wrapper: this.Theme.wrapper,
+                count: 'VuePagination__count ' + this.Theme.count
+            },
+            hasRecords: this.hasRecords,
+            count: this.count,
+            texts: this.opts.texts,
+            opts: this.opts,
+            allowedChunkClass: this.allowedChunkClass,
+            allowedPageClass: this.allowedPageClass,
+            setChunk: this.setChunk,
+            prev: this.prev,
+            next: this.next,
+            totalPages: this.totalPages,
+            totalChunks: this.totalChunks,
+            page: this.Page(),
+            records: this.records(),
+            perPage: this.perPage(),
+            formatNumber: this.formatNumber
+        });
+    },
+
+    data: function data() {
+        return {
+            firstPage: this.$parent.value,
+            For: this.$parent.for,
+            Options: this.$parent.options
+        };
+    },
+    watch: {
+        page: function page(val) {
+            if (this.opts.chunksNavigation === 'scroll' && this.allowedPage(val) && !this.inDisplay(val)) {
+                if (val === this.totalPages) {
+                    var first = val - this.opts.chunk + 1;
+                    this.firstPage = first >= 1 ? first : 1;
+                } else {
+                    this.firstPage = val;
+                }
+            }
+
+            this.$parent.$emit('paginate', val);
+        }
+    },
+    computed: {
+        Records: function Records() {
+            return this.records();
+        },
+        PerPage: function PerPage() {
+            return this.perPage();
+        },
+        opts: function opts() {
+            return _merge2.default.recursive((0, _config2.default)(), this.Options);
+        },
+        Theme: function Theme() {
+
+            if (_typeof(this.opts.theme) === 'object') {
+                return this.opts.theme;
+            }
+
+            var themes = {
+                bootstrap3: __webpack_require__(/*! ./themes/bootstrap3 */ "./node_modules/vue-pagination-2/compiled/themes/bootstrap3.js"),
+                bootstrap4: __webpack_require__(/*! ./themes/bootstrap4 */ "./node_modules/vue-pagination-2/compiled/themes/bootstrap4.js"),
+                bulma: __webpack_require__(/*! ./themes/bulma */ "./node_modules/vue-pagination-2/compiled/themes/bulma.js")
+            };
+
+            if (_typeof(themes[this.opts.theme]) === undefined) {
+                throw 'vue-pagination-2: the theme ' + this.opts.theme + ' does not exist';
+            }
+
+            return themes[this.opts.theme];
+        },
+        page: function page() {
+            return this.Page();
+        },
+
+        pages: function pages() {
+
+            if (!this.Records) return [];
+
+            return range(this.paginationStart, this.pagesInCurrentChunk);
+        },
+        totalPages: function totalPages() {
+            return this.Records ? Math.ceil(this.Records / this.PerPage) : 1;
+        },
+        totalChunks: function totalChunks() {
+            return Math.ceil(this.totalPages / this.opts.chunk);
+        },
+        currentChunk: function currentChunk() {
+            return Math.ceil(this.page / this.opts.chunk);
+        },
+        paginationStart: function paginationStart() {
+            if (this.opts.chunksNavigation === 'scroll') {
+                return this.firstPage;
+            }
+
+            return (this.currentChunk - 1) * this.opts.chunk + 1;
+        },
+        pagesInCurrentChunk: function pagesInCurrentChunk() {
+            return this.paginationStart + this.opts.chunk <= this.totalPages ? this.opts.chunk : this.totalPages - this.paginationStart + 1;
+        },
+        hasRecords: function hasRecords() {
+            return parseInt(this.Records) > 0;
+        },
+
+        count: function count() {
+
+            if (/{page}/.test(this.opts.texts.count)) {
+
+                if (this.totalPages <= 1) return '';
+
+                return this.opts.texts.count.replace('{page}', this.page).replace('{pages}', this.totalPages);
+            }
+
+            var parts = this.opts.texts.count.split('|');
+            var from = (this.page - 1) * this.PerPage + 1;
+            var to = this.page == this.totalPages ? this.Records : from + this.PerPage - 1;
+            var i = Math.min(this.Records == 1 ? 2 : this.totalPages == 1 ? 1 : 0, parts.length - 1);
+
+            return parts[i].replace('{count}', this.formatNumber(this.Records)).replace('{from}', this.formatNumber(from)).replace('{to}', this.formatNumber(to));
+        }
+    },
+    methods: {
+        setPage: function setPage(page) {
+            if (this.allowedPage(page)) {
+                this.paginate(page);
+            }
+        },
+        paginate: function paginate(page) {
+            var _this2 = this;
+
+            this.$parent.$emit('input', page);
+
+            this.$nextTick(function () {
+                if (_this2.$el) {
+                    _this2.$el.querySelector('li.' + _this2.Theme.active + ' a').focus();
+                }
+            });
+        },
+
+        next: function next() {
+            return this.setPage(this.page + 1);
+        },
+        prev: function prev() {
+            return this.setPage(this.page - 1);
+        },
+        inDisplay: function inDisplay(page) {
+
+            var start = this.firstPage;
+            var end = start + this.opts.chunk - 1;
+
+            return page >= start && page <= end;
+        },
+
+        nextChunk: function nextChunk() {
+            return this.setChunk(1);
+        },
+        prevChunk: function prevChunk() {
+            return this.setChunk(-1);
+        },
+        setChunk: function setChunk(direction) {
+            this.setPage((this.currentChunk - 1 + direction) * this.opts.chunk + 1);
+        },
+        allowedPage: function allowedPage(page) {
+            return page >= 1 && page <= this.totalPages;
+        },
+        allowedChunk: function allowedChunk(direction) {
+            return direction == 1 && this.currentChunk < this.totalChunks || direction == -1 && this.currentChunk > 1;
+        },
+        allowedPageClass: function allowedPageClass(direction) {
+            return this.allowedPage(direction) ? '' : this.Theme.disabled;
+        },
+        allowedChunkClass: function allowedChunkClass(direction) {
+            return this.allowedChunk(direction) ? '' : this.Theme.disabled;
+        },
+        activeClass: function activeClass(page) {
+            return this.page == page ? this.Theme.active : '';
+        },
+        formatNumber: function formatNumber(num) {
+
+            if (!this.opts.format) return num;
+
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    }
+};
+
+
+function range(start, count) {
+    return Array.apply(0, Array(count)).map(function (element, index) {
+        return index + start;
+    });
+}
+module.exports = exports['default'];
+
+/***/ }),
+
+/***/ "./node_modules/vue-pagination-2/compiled/config.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/vue-pagination-2/compiled/config.js ***!
+  \**********************************************************/
+/***/ ((module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+    value: true
+}));
+
+exports["default"] = function () {
+    return {
+        format: true,
+        chunk: 10,
+        chunksNavigation: 'fixed',
+        edgeNavigation: false,
+        theme: 'bootstrap3',
+        template: null,
+        texts: {
+            count: 'Showing {from} to {to} of {count} records|{count} records|One record',
+            first: 'First',
+            last: 'Last',
+            nextPage: '>',
+            nextChunk: '>>',
+            prevPage: '<',
+            prevChunk: '<<'
+        }
+    };
+};
+
+module.exports = exports['default'];
+
+/***/ }),
+
+/***/ "./node_modules/vue-pagination-2/compiled/main.js":
+/*!********************************************************!*\
+  !*** ./node_modules/vue-pagination-2/compiled/main.js ***!
+  \********************************************************/
+/***/ ((module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+
+var _Pagination = __webpack_require__(/*! ./Pagination */ "./node_modules/vue-pagination-2/compiled/Pagination.js");
+
+var _Pagination2 = _interopRequireDefault(_Pagination);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports["default"] = _Pagination2.default;
+module.exports = exports['default'];
+
+/***/ }),
+
+/***/ "./node_modules/vue-pagination-2/compiled/template.js":
+/*!************************************************************!*\
+  !*** ./node_modules/vue-pagination-2/compiled/template.js ***!
+  \************************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = function (props) {
+
+    return function (h) {
+
+        var theme = this.theme;
+        var prevChunk = '';
+        var nextChunk = '';
+        var firstPage = '';
+        var lastPage = '';
+        var items = this.pages.map(function (page) {
+
+            return h(
+                'li',
+                { 'class': 'VuePagination__pagination-item ' + theme.item + ' ' + this.activeClass(page),
+                    on: {
+                        'click': this.setPage.bind(this, page)
+                    }
+                },
+                [h(
+                    'a',
+                    { 'class': theme.link + ' ' + this.activeClass(page),
+                        attrs: { role: 'button' }
+                    },
+                    [this.formatNumber(page)]
+                )]
+            );
+        }.bind(this));
+
+        if (this.opts.edgeNavigation && this.totalChunks > 1) {
+            firstPage = h(
+                'li',
+                { 'class': 'VuePagination__pagination-item ' + theme.item + ' ' + (this.page === 1 ? theme.disabled : '') + ' VuePagination__pagination-item-first-page',
+                    on: {
+                        'click': this.setPage.bind(this, 1)
+                    }
+                },
+                [h(
+                    'a',
+                    { 'class': theme.link,
+                        attrs: { disabled: this.page === 1 }
+                    },
+                    [this.opts.texts.first]
+                )]
+            );
+
+            lastPage = h(
+                'li',
+                { 'class': 'VuePagination__pagination-item ' + theme.item + ' ' + (this.page === this.totalPages ? theme.disabled : '') + ' VuePagination__pagination-item-last-page',
+                    on: {
+                        'click': this.setPage.bind(this, this.totalPages)
+                    }
+                },
+                [h(
+                    'a',
+                    { 'class': theme.link,
+                        attrs: { disabled: this.page === this.totalPages }
+                    },
+                    [this.opts.texts.last]
+                )]
+            );
+        }
+
+        if (this.opts.chunksNavigation === 'fixed') {
+
+            prevChunk = h(
+                'li',
+                { 'class': 'VuePagination__pagination-item ' + theme.item + ' ' + theme.prev + ' VuePagination__pagination-item-prev-chunk ' + this.allowedChunkClass(-1),
+                    on: {
+                        'click': this.setChunk.bind(this, -1)
+                    }
+                },
+                [h(
+                    'a',
+                    { 'class': theme.link,
+                        attrs: { disabled: !!this.allowedChunkClass(-1) }
+                    },
+                    [this.opts.texts.prevChunk]
+                )]
+            );
+
+            nextChunk = h(
+                'li',
+                { 'class': 'VuePagination__pagination-item ' + theme.item + ' ' + theme.next + ' VuePagination__pagination-item-next-chunk ' + this.allowedChunkClass(1),
+                    on: {
+                        'click': this.setChunk.bind(this, 1)
+                    }
+                },
+                [h(
+                    'a',
+                    { 'class': theme.link,
+                        attrs: { disabled: !!this.allowedChunkClass(1) }
+                    },
+                    [this.opts.texts.nextChunk]
+                )]
+            );
+        }
+
+        return h(
+            'div',
+            { 'class': 'VuePagination ' + theme.wrapper },
+            [h(
+                'nav',
+                { 'class': '' + theme.nav },
+                [h(
+                    'ul',
+                    {
+                        directives: [{
+                            name: 'show',
+                            value: this.totalPages > 1
+                        }],
+
+                        'class': theme.list + ' VuePagination__pagination' },
+                    [firstPage, prevChunk, h(
+                        'li',
+                        { 'class': 'VuePagination__pagination-item ' + theme.item + ' ' + theme.prev + ' VuePagination__pagination-item-prev-page ' + this.allowedPageClass(this.page - 1),
+                            on: {
+                                'click': this.prev.bind(this)
+                            }
+                        },
+                        [h(
+                            'a',
+                            { 'class': theme.link,
+                                attrs: { disabled: !!this.allowedPageClass(this.page - 1)
+                                }
+                            },
+                            [this.opts.texts.prevPage]
+                        )]
+                    ), items, h(
+                        'li',
+                        { 'class': 'VuePagination__pagination-item ' + theme.item + ' ' + theme.next + ' VuePagination__pagination-item-next-page ' + this.allowedPageClass(this.page + 1),
+                            on: {
+                                'click': this.next.bind(this)
+                            }
+                        },
+                        [h(
+                            'a',
+                            { 'class': theme.link,
+                                attrs: { disabled: !!this.allowedPageClass(this.page + 1)
+                                }
+                            },
+                            [this.opts.texts.nextPage]
+                        )]
+                    ), nextChunk, lastPage]
+                ), h(
+                    'p',
+                    {
+                        directives: [{
+                            name: 'show',
+                            value: parseInt(this.records)
+                        }],
+
+                        'class': 'VuePagination__count ' + theme.count },
+                    [this.count]
+                )]
+            )]
+        );
+    }.bind(props);
+};
+
+/***/ }),
+
+/***/ "./node_modules/vue-pagination-2/compiled/themes/bootstrap3.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/vue-pagination-2/compiled/themes/bootstrap3.js ***!
+  \*********************************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = {
+    nav: '',
+    count: '',
+    wrapper: '',
+    list: 'pagination',
+    item: 'page-item',
+    link: 'page-link',
+    next: '',
+    prev: '',
+    active: 'active',
+    disabled: 'disabled'
+};
+
+/***/ }),
+
+/***/ "./node_modules/vue-pagination-2/compiled/themes/bootstrap4.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/vue-pagination-2/compiled/themes/bootstrap4.js ***!
+  \*********************************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = {
+    nav: '',
+    count: '',
+    wrapper: '',
+    list: 'pagination',
+    item: 'page-item',
+    link: 'page-link',
+    next: '',
+    prev: '',
+    active: 'active',
+    disabled: 'disabled'
+};
+
+/***/ }),
+
+/***/ "./node_modules/vue-pagination-2/compiled/themes/bulma.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/vue-pagination-2/compiled/themes/bulma.js ***!
+  \****************************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = {
+    nav: '',
+    count: '',
+    wrapper: 'pagination',
+    list: 'pagination-list',
+    item: '',
+    link: 'pagination-link',
+    next: '',
+    prev: '',
+    active: 'is-current',
+    disabled: '' // uses the disabled HTML attirbute
+};
 
 /***/ }),
 

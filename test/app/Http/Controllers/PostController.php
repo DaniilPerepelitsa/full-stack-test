@@ -28,15 +28,22 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getPostsForCategory($id){
-        $category = Category::where('id', $id)->with('posts')->first();
+    public function getPostsForCategory(int $id){
+        $posts = Category::find($id)->posts()->paginate(5)->toArray();
 
-        foreach ($category->posts as $key => $post){
-            $post->content = strip_tags(preg_replace('/<[^>]*>/','', str_replace(array("&nbsp;","\n","\r"),"", html_entity_decode($post->content,ENT_QUOTES,'UTF-8'))));
-            $post->title = strip_tags(preg_replace('/<[^>]*>/','', str_replace(array("&nbsp;","\n","\r"),"", html_entity_decode($post->title,ENT_QUOTES,'UTF-8'))));
-        }
+        $posts['data'] = array_map(function (array $post){
+            return [
+                'id' => $post['id'],
+                'slug' => $post['slug'],
+                'title' => strip_tags(preg_replace('/<[^>]*>/','', str_replace(array("&nbsp;","\n","\r"),"", html_entity_decode($post['title'],ENT_QUOTES,'UTF-8')))),
+                'content' => strip_tags(preg_replace('/<[^>]*>/','', str_replace(array("&nbsp;","\n","\r"),"", html_entity_decode($post['content'],ENT_QUOTES,'UTF-8')))),
+                "media" => "",
+                "created_at" => $post['created_at'],
+                "updated_at" => $post['updated_at'],
+            ];
+        },$posts['data']);
 
-        return response()->json($category->posts);
+        return response()->json($posts);
     }
 
     /**
@@ -47,35 +54,27 @@ class PostController extends Controller
      */
     public function searchPosts(Request $request){
 
-//        $posts = Post::with('categories')
-//            ->whereRaw(
-//            "MATCH(title, content) AGAINST(?)",
-//            [$request->search]
-//        )->get();
-
-        $category = Category::where('id', $request->id)->with('posts')->first();
-
-        $posts = [];
         if(!empty($request->search)){
-            foreach ($category->posts as $key => $post){
-                $item = Post::where('id', $post->id)
-                    ->whereRaw(
-                        "MATCH(title, content) AGAINST(?)",
-                        [$request->search]
-                    )->first();
-                if (!empty($item)){
-                    $posts[$key] = $item;
-                }
-            }
+            $posts = Category::find($request->id)->posts()->whereRaw(
+                "MATCH(title, content) AGAINST(?)",
+                [$request->search]
+            )->paginate(5)->toArray();
         }
         else{
-            $posts = $category->posts;
+            $posts = Category::find($request->id)->posts()->paginate(5)->toArray();
         }
 
-        foreach ($posts as $key => $post){
-            $post->content = strip_tags(preg_replace('/<[^>]*>/','', str_replace(array("&nbsp;","\n","\r"),"", html_entity_decode($post->content,ENT_QUOTES,'UTF-8'))));
-            $post->title = strip_tags(preg_replace('/<[^>]*>/','', str_replace(array("&nbsp;","\n","\r"),"", html_entity_decode($post->title,ENT_QUOTES,'UTF-8'))));
-        }
+        $posts['data'] = array_map(function (array $post){
+            return [
+                'id' => $post['id'],
+                'slug' => $post['slug'],
+                'title' => strip_tags(preg_replace('/<[^>]*>/','', str_replace(array("&nbsp;","\n","\r"),"", html_entity_decode($post['title'],ENT_QUOTES,'UTF-8')))),
+                'content' => strip_tags(preg_replace('/<[^>]*>/','', str_replace(array("&nbsp;","\n","\r"),"", html_entity_decode($post['content'],ENT_QUOTES,'UTF-8')))),
+                "media" => "",
+                "created_at" => $post['created_at'],
+                "updated_at" => $post['updated_at'],
+            ];
+        },$posts['data']);
 
         return response()->json($posts);
     }

@@ -1,11 +1,13 @@
 import Vue from 'vue';
 require('./bootstrap');
 
+import Pagination from 'vue-pagination-2';
 import VueRouter from 'vue-router'
 import ExampleComponent from "./components/Categories";
 import Posts from "./components/Posts";
 import PostItem from "./components/PostItem";
 
+Vue.component('pagination', Pagination);
 Vue.use(VueRouter)
 
 const router = new VueRouter({

@@ -21,7 +21,6 @@ class SpaController extends Controller
 
             /** @var Post $post */
             $post = Post::firstOrCreate([
-//                'id' => $data['id'],
                 'title' => $data['title'],
                 'slug' => $data['slug'],
                 'content' => $data['content'][0]['content'],
