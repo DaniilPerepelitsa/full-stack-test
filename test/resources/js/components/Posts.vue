@@ -41,10 +41,8 @@ export default {
     props: ['id'],
     methods: {
         getPostsForCategory(id, page = 1){
-            console.log('update');
             axios.get('/api/categories/'+this.id+'/posts?page='+page)
                 .then((response) => {
-                    console.log('DATA',response.data)
                     this.pager = response.data
                     this.perPage = response.data.per_page
                     this.lastPage = response.data.last_page

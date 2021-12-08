@@ -59,6 +59,7 @@ class PostController extends Controller
                 "MATCH(title, content) AGAINST(?)",
                 [$request->search]
             )->paginate(5)->toArray();
+
         }
         else{
             $posts = Category::find($request->id)->posts()->paginate(5)->toArray();
@@ -75,7 +76,6 @@ class PostController extends Controller
                 "updated_at" => $post['updated_at'],
             ];
         },$posts['data']);
-
         return response()->json($posts);
     }
 }

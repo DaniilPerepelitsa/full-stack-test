@@ -5320,7 +5320,6 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       axios.get('/api/post/' + this.id).then(function (response) {
-        console.log(response.data);
         _this.post = response.data;
       });
     }
@@ -5388,9 +5387,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       var page = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-      console.log('update');
       axios.get('/api/categories/' + this.id + '/posts?page=' + page).then(function (response) {
-        console.log('DATA', response.data);
         _this.pager = response.data;
         _this.perPage = response.data.per_page;
         _this.lastPage = response.data.last_page;

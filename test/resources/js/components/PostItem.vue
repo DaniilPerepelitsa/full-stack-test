@@ -26,7 +26,6 @@ name: "PostItem",
         getPost(){
             axios.get('/api/post/'+this.id)
                 .then((response) => {
-                    console.log(response.data)
                     this.post = response.data
                 })
         },
